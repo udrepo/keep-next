@@ -10,7 +10,7 @@ import Link from 'next/link';
 import axios from "axios";
 
 
-export default function Home() {
+export default function Favorites() {
     const [isLoading, setIsLoading] = useState(true);
     const [bookmarks, setBookmarks] = useState([]);
     const [link, setLink] = useState("");
@@ -43,25 +43,6 @@ export default function Home() {
                 }).then(res => {
                     setIsLoading(true);
                     setBookmarks(res.data.bookmarks);
-                });
-            }
-        });
-    }
-
-    const isFavHandler = async (e, id, isFav) =>{
-        e.preventDefault();
-        console.log('id' + id)
-        auth.onIdTokenChanged(async user => {
-            if (!user) console.log('fuck!');
-            else {
-                const {token} = await user.getIdTokenResult();
-                axios.patch(`http://localhost:3030/api/bm/${id}`,
-                    {isFav: !isFav},
-                    {
-                    headers: {token}
-                }).then(res => {
-                    setIsLoading(true);
-                    console.log(res)
                 });
             }
         });
@@ -124,10 +105,10 @@ export default function Home() {
             <main className="px-24 py-10 grid grid-cols-6 gap-4">
                 <div className="m-4 text">
                     <ul className="my-8">
-                        <li className="bg-red-300  py-2 px-4 rounded-xl">
+                        <li className="py-2 px-4 ">
                             <Link href={'/home'}><a>My list</a></Link>
                         </li>
-                        <li className="py-2 px-4 ">
+                        <li className="bg-red-300 py-2 px-4 rounded-xl">
                             <Link href={'/favorites'}><a>Favorites</a></Link>
                         </li>
                         <p className="py-2 px-4 ">
@@ -167,11 +148,10 @@ export default function Home() {
                     </div>
                     <hr/>
                     <div className="grid grid-cols-3 gap-4">
-                        {bookmarks.map(bm => <Bookmark key={bm._id}
+                        {bookmarks.filter(bm=> bm.isFav === true).map(bm => <Bookmark key={bm._id}
                                                        id={bm._id}
                                                        title={bm.title} image={bm.image} isFav={bm.isFav} desc={bm.desc}
                                                        link={bm.link}
-                                                       isFavHandler = {isFavHandler}
                                                        deleteBookmarkHandler = {deleteBookmarkHandler}
                         />).reverse()}
                     </div>
